@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ES6 Transpiling</title>
+  </head>
+  <body>
+    <div id="wrapper"></div>
+    <script>
+      //TRANSPILING
+
+      // var foo = [1, 2, 3];
+
+      // var obj = {
+      //   foo,
+      // };
+
+      // console.log(obj.foo);
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      //       Shims/Polyfills
+      // Not all new ES6 features need a transpiler. Polyfills (aka shims) are a pattern for defining equivalent behavior from a newer environment into an older environment, when possible. Syntax cannot be polyfilled, but APIs often can be.
+
+      // For example, Object.is(..) is a new utility for checking strict equality of two values but without the nuanced exceptions that === has for NaN and -0 values. The polyfill for Object.is(..) is pretty easy:
+
+      // if (!Object.is) {
+      //   Object.is = function (v1, v2) {
+      //     // test for `-0`
+      //     if (v1 === 0 && v2 === 0) {
+      //       return 1 / v1 === 1 / v2;
+      //     }
+      //     // test for `NaN`
+      //     if (v1 !== v1) {
+      //       return v2 !== v2;
+      //     }
+      //     // everything else
+      //     return v1 === v2;
+      //   };
+      // }
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      //       Block-Scoped Declarations
+      // You're probably aware that the fundamental unit of variable scoping in JavaScript has always been the function. If you needed to create a block of scope, the most prevalent way to do so other than a regular function declaration was the immediately invoked function expression (IIFE). For example:
+
+      // var a = 2;
+
+      // (function IIFE() {
+      //   var a = 3;
+      //   console.log(a); // 3
+      // })();
+
+      // console.log(a); // 2
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // var a = 2;
+
+      // {
+      //   let a = 3;
+      //   console.log(a); // 3
+      // }
+
+      // console.log(a); // 2
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // let a = 2;
+
+      // if (a > 1) {
+      //   let b = a * 3;
+      //   console.log(b); // 6
+
+      //   for (let i = a; i <= b; i++) {
+      //     let j = i + 10;
+      //     console.log(j);
+      //   }
+      //   // 12 13 14 15 16
+
+      //   let c = a + b;
+      //   console.log(c); // 8
+      // }
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // Accessing a let-declared variable earlier than its let .. declaration/initialization causes an error, whereas with var declarations the ordering doesn't matter (except stylistically).
+
+      // {
+      //   console.log(a);
+      //   console.log(b);
+
+      //   var a;
+      //   let b;
+      // }
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // {
+      //   // `a` is not declared
+      //   if (typeof a === "undefined") {
+      //     console.log("cool");
+      //   }
+
+      //   // `b` is declared, but in its TDZ
+      //   if (typeof b === "undefined") {
+      //     // ReferenceError!
+      //     // ..
+      //   }
+
+      //   // ..
+
+      //   let b;
+      // }
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // var funcs = [];
+
+      // for (let i = 0; i < 5; i++) {
+      //   funcs.push(function () {
+      //     console.log(i);
+      //   });
+      // }
+
+      // funcs[3]();
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // var funcs = [];
+
+      // for (var i = 0; i < 5; i++) {
+      //   funcs.push(function () {
+      //     console.log(i);
+      //   });
+      // }
+
+      // funcs[3]();
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // Constants are not a restriction on the value itself, but on the variable's assignment of that value. In other words, the value is not frozen or immutable because of const, just the assignment of it. If the value is complex, such as an object or array, the contents of the value can still be modified:
+      // The a variable doesn't actually hold a constant array; rather, it holds a constant reference to the array. The array itself is freely mutable.
+
+      // {
+      //   const a = [1,2,3];
+      //   a.push( 4 );
+      //   console.log( a );
+
+      //   a = 42;
+      // }
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // Spread/Rest
+
+      // function foo(x,y,z) {
+      //   console.log( x, y, z );
+      // }
+
+      // foo( ...[1,2,3] );
+
+      // foo.apply( null, [1,2,3] );
+
+
+
+      // function foo(...args) {
+      //   console.log( args );
+      // }
+
+      // foo( 1, 2, 3, 4, 5);
+
+
+
+
+      // doing things the new ES6 way
+      // function foo(...args) {
+      //   // `args` is already a real array
+
+      //   // discard first element in `args`
+      //   args.shift();
+
+      //   // pass along all of `args` as arguments
+      //   // to `console.log(..)`
+      //   console.log( ...args );
+      // }
+
+      // // doing things the old-school pre-ES6 way
+      // function bar() {
+      //   console.log(arguments)
+      //   // turn `arguments` into a real array
+      //   var args = Array.prototype.slice.call( arguments );
+
+      //   // add some elements on the end
+      //   args.push( 4, 5 );
+
+      //   // filter out odd numbers
+      //   args = args.filter( function(v){
+      //     return v % 2 == 0;
+      //   } );
+
+      //   // pass along all of `args` as arguments
+      //   // to `foo(..)`
+      //   foo.apply( null, args );
+      // }
+
+      // bar( 0, 1, 2, 3 );
+
+      // "arguments" is a long deprecated array like object
+
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // DEFAULT PARAMETERS / VALUES
+
+      // function foo(x,y) {
+      //   x = x || 11;
+      //   y = y || 31;
+
+      //   console.log( x + y );
+      // }
+
+      // foo();
+      // foo( 5, 6 );
+      // foo( 5 );
+      // foo( null, 6 );
+      // foo( 0, 42 );
+
+
+
+      // function foo(x,y) {
+      //   x = (x !== undefined) ? x : 11;
+      //   y = (y !== undefined) ? y : 31;
+      //   console.log( x + y );
+      // }
+
+      // foo( 0, 42 );
+      // foo( undefined, 6 );
+
+
+      // Default Value Expressions
+      // Function default values can be more than just simple values like 31; they can be any valid expression, even a function call:
+
+      // function bar(val) {
+      //   console.log( "bar called!" );
+      //   return y + val;
+      // }
+
+      // function foo(x = y + 3, z = bar( x )) {
+      //   console.log( x, z );
+      // }
+
+      // var y = 5;
+      // foo(); //?
+            
+      // foo( 10 ); //?
+                        
+      // y = 6;
+      // foo( undefined, 10 ); //?
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // Destructuring
+      // ES6 introduces a new syntactic feature called destructuring, which may be a little less confusing if you instead think of it as structured assignment. To understand this meaning, consider:
+
+      // function foo() {
+      //   return [1,2,3];
+      // }
+      // var tmp = foo(), a = tmp[0], b = tmp[1], c = tmp[2];
+
+      // console.log( a, b, c );
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      // function foo() {
+      //   return [1,2,3];
+      // }
+
+      // function bar() {
+      //   return {
+      //     x: 4,
+      //     y: 5,
+      //     z: 6
+      //   };
+      // }
+
+      // var [ a, b, c ] = foo();
+      // var { x: x, y: y, z: z } = bar();
+
+      // console.log( a, b, c );
+      // console.log( x, y, z );
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+      var o1 = { a: 1, b: 2, c: 3 },
+      o2 = {};
+
+      ( { a: o2.x, b: o2.y, c: o2.z } = o1 );
+
+      console.log( o2.x, o2.y, o2.z );
+
+
+
+      var o1 = { a: 1, b: 2, c: 3 }, a2 = [];
+
+      ( { a: a2[0], b: a2[1], c: a2[2] } = o1 );
+
+      console.log( a2 );
+
+
+
+      var a1 = [ 1, 2, 3 ],
+        o2 = {};
+
+      [ o2.a, o2.b, o2.c ] = a1;
+
+      console.log( o2.a, o2.b, o2.c );
+
+
+
+      var a1 = [ 1, 2, 3 ],
+        a2 = [];
+
+      [ a2[2], a2[0], a2[1] ] = a1;
+
+      console.log( a2 );
+
+
+      //////////////////////////////////////////////////////////////////////////////////
+
+
+      function calculateTotal(discount) {
+        const total = this.prices.reduce((sum, price) => sum + price, 0);
+        return total * (1 - discount);
+      }
+
+      const cart = {
+        prices: [20, 30, 50]
+      };
+
+      const discount = 0.1;
+
+      const totalPrice = calculateTotal.call(cart, discount);
+
+      console.log("Total price after discount: " + totalPrice);
+
+
+
+    </script>
+  </body>
+</html>
